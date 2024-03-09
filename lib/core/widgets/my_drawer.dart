@@ -1,5 +1,7 @@
 import 'package:chat/core/service/auth_service.dart';
 import 'package:chat/view/settings_screen/settings_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -7,7 +9,20 @@ class MyDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AuthService _authservice = AuthService();
+    final AuthService _authService = AuthService();
+
+    // Get the currently logged-in user
+    final User? currentUser = _authService.getCurrentUser();
+
+    // Stream to listen for changes in the user document
+    Stream<DocumentSnapshot>? userSnapshot;
+
+    if (currentUser != null) {
+      userSnapshot = FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUser.uid)
+          .snapshots();
+    }
 
     return Drawer(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -16,33 +31,61 @@ class MyDrawer extends StatelessWidget {
         children: [
           Column(
             children: [
-              //logo
+              // Logo
               DrawerHeader(
                 child: Center(
-                  child: Icon(
-                    Icons.message,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 40,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 40),
+                        child: Icon(
+                          Icons.message,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 40,
+                        ),
+                      ),
+                      if (userSnapshot != null)
+                        StreamBuilder<DocumentSnapshot>(
+                          stream: userSnapshot,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Text("Error fetching user name");
+                            }
+                            if (snapshot.hasData) {
+                              final data = snapshot.data!;
+                              if (data != null && data['userName'] != null) {
+                                return Text(data['userName']);
+                              } else {
+                                return const Text("No name");
+                              }
+                            }
+                            return const CircularProgressIndicator();
+                          },
+                        )
+                      else
+                        const Text("Loading..."),
+                    ],
                   ),
                 ),
               ),
-              //home
+
+              // Home
               Padding(
                 padding: const EdgeInsets.only(left: 25),
                 child: ListTile(
-                  title: Text('H O M E'),
-                  leading: Icon(Icons.home),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
+                  title: const Text('H O M E'),
+                  leading: const Icon(Icons.home),
+                  onTap: () => Navigator.pop(context),
                 ),
               ),
-              //setting
+
+              // Settings
               Padding(
                 padding: const EdgeInsets.only(left: 25),
                 child: ListTile(
-                  title: Text('S E T T I N G S'),
-                  leading: Icon(Icons.settings),
+                  title: const Text('S E T T I N G S'),
+                  leading: const Icon(Icons.settings),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -56,15 +99,14 @@ class MyDrawer extends StatelessWidget {
               ),
             ],
           ),
-          //logout
+
+          // Logout
           Padding(
             padding: const EdgeInsets.only(left: 25, bottom: 25),
             child: ListTile(
-              title: Text('L O G O U T'),
-              leading: Icon(Icons.logout),
-              onTap: () {
-                _authservice.signOut();
-              },
+              title: const Text('L O G O U T'),
+              leading: const Icon(Icons.logout),
+              onTap: () => _authService.signOut(),
             ),
           ),
         ],

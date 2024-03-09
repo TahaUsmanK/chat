@@ -4,16 +4,30 @@ import 'package:chat/core/widgets/my_textfield.dart';
 import 'package:chat/view/signup_screen/signup_screen.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({
     super.key,
   });
 
   @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  @override
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
+    final TextEditingController userNameController = TextEditingController();
+    bool isObscured = false;
     AuthService _authservice = AuthService();
+
+    void obscurePass() {
+      setState(() {
+        isObscured = !isObscured;
+      });
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: Center(
@@ -35,6 +49,12 @@ class LoginScreen extends StatelessWidget {
             ),
             //SizedBox
             const SizedBox(height: 40),
+            // textfield 0
+            MyTextField(
+                controller: userNameController,
+                hintText: 'Enter your Name',
+                labelText: 'Username',
+                obscureText: false),
             // textfield 1
             MyTextField(
                 controller: emailController,
@@ -46,13 +66,17 @@ class LoginScreen extends StatelessWidget {
                 controller: passwordController,
                 hintText: 'Enter your Password',
                 labelText: 'Password',
+                suffix: IconButton(
+                    onPressed: obscurePass,
+                    icon: Icon(
+                        isObscured ? Icons.visibility : Icons.visibility_off)),
                 obscureText: true),
             // button
             MyButton(
                 text: 'Login',
                 ontap: () {
-                  _authservice.signIn(
-                      emailController.text, passwordController.text);
+                  _authservice.signIn(emailController.text,
+                      passwordController.text, userNameController.text);
                 }),
             //SizedBox
             const SizedBox(height: 20),

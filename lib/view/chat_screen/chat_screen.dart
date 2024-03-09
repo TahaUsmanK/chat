@@ -6,10 +6,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
-  final String recieverEmail;
+  final String recieverUsername;
   final String recieverID;
   ChatScreen(
-      {super.key, required this.recieverEmail, required this.recieverID});
+      {super.key, required this.recieverUsername, required this.recieverID});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -70,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         centerTitle: true,
-        title: Text(widget.recieverEmail),
+        title: Text(widget.recieverUsername),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.grey,
         elevation: 0,

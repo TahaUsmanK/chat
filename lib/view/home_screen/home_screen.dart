@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => ChatScreen(
-                recieverEmail: userData['email'],
+                recieverUsername: userData['userName'],
                 recieverID: userData['uid'],
               ),
             ),

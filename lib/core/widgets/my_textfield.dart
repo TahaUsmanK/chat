@@ -6,12 +6,14 @@ class MyTextField extends StatelessWidget {
   final String labelText;
   final bool obscureText;
   final FocusNode? focusNode;
+  final Widget? suffix;
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
     required this.labelText,
     required this.obscureText,
+    this.suffix,
     this.focusNode,
   });
 
@@ -24,6 +26,7 @@ class MyTextField extends StatelessWidget {
         controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
+          suffix: suffix,
           enabledBorder: OutlineInputBorder(
             borderSide:
                 BorderSide(color: Theme.of(context).colorScheme.tertiary),
